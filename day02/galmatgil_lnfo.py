@@ -2,6 +2,7 @@
 from inspect import getgeneratorlocals
 import os
 from re import L
+from sqlite3 import connect
 import sys
 import urllib.request
 import datetime
@@ -9,6 +10,7 @@ import time
 import json
 from django.http import JsonResponse
 import pandas as pd
+import pymysql
 
 ServiceKey = 'uG4o2nY2aD7Go6B3N7ROW7I%2FI7Dc0ywfp%2BNPDgpV%2F9DshKHpJI6HxBuBmKUjxWv4kw0771ow8xT5%2BejwgDpRyw%3D%3D'
 
@@ -84,6 +86,24 @@ def main():
         result_df.to_csv(f'./부산갈맷길정보.csv',index=False,
                         encoding='utf-8') # 엑셀로 보고 싶다 cp949 csv로 보고 싶다 utf-8
         print('csv파일 저장완료!!')
+
+        # DB 저장
+        connection = pymysql.connect(host ='localhost', user = 'root', password = '1234', db = 'crawling_data')
+
+        cursor = connection.cursor()
+
+        # 컬럼명 동적으로 만들기
+        cols = '`,`'.join([str(i) for i in result_df.columns.tolist()])
+
+        for i, row in result_df.iterrows():
+            sql = 'INSERT INTO `galmatgil_info` (`' + cols + '`) VALUES (' + '%s, '*(len(row)-1) +' %s)'
+            cursor.execute(sql, tuple(row))
+
+        connection.commit()
+        
+
+        print('DB저장완료!')
+        connection.close() #커넥션을 했으면 끊어줘야하기 때문에 필요하다.
 
 if __name__=='__main__':
     main()
