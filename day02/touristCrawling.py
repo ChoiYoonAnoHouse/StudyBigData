@@ -10,6 +10,7 @@ import pandas as pd
 
 ServiceKey = 'Ody77GLuYeR%2FeFqbpduMN2Bi4Cka2fztbgnj6E2Eux1kUhy3e4epR28XKBUaObiqPoVzAizxXMBPXtMyuC9v9Q%3D%3D'
 
+# url 접속 요청 후 응답리턴 함수
 def getRequestUrl(url):
     req = urllib.request.Request(url)
 
@@ -86,14 +87,18 @@ def main():
     nEndYear = int(input('데이터를 몇 년까지 수집 할까요? '))
     ed_cd = 'E' # D:한국인 외래 관광객 / E : 방한 외국인
 
-    (jsonResult, result, dataEnd) = \
-    getTourismStatsService(nat_cd, ed_cd, nStartYear, nEndYear)
+    (jsonResult, result , natName, ed, dataEnd ) =\
+        getTourismStatsService(nat_cd, ed_cd, nStartYear,nEndYear)
 
     if natName == '':
-        print('데이터 전달을 실패했습니다. 공공데이터포털 서비스를 확인해주세요.')
+        print('데이터 전달 실패. 공공데이터포털 서비스 확인 요망')
     else:
-        pass
+        #파일저장 csv
+        columns = ['입국국가','국가코드','입국연월','입국자수']
+        result_df= pd.DataFrame(result,columns=columns)
+        result_df.to_csv(f'./{natName}_{ed}_{nStartYear}_{dataEnd}.csv',index=False,
+                        encoding='utf-8') # 엑셀로 보고 싶다 cp949 csv로 보고 싶다 utf-8
+        print('csv파일 저장완료!!')
 
-
-if __name__== '__main__':
+if __name__ == '__main__':
     main()
