@@ -125,7 +125,7 @@ class qTemplate(QWidget):
         
     def getPostData(self, post):
         temp = []
-        title = self.strip_tag(post['title'])
+        title = self.strip_tag(post['title']) # 모든 곳에서 html 태그 제거
         description = post['description']
         originallink = post['originallink']
         link = post['link']
